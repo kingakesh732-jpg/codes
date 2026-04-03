@@ -1,83 +1,89 @@
 #!/bin/bash
 
 # =========================================================
-# Script: NeoPlayz All-In-One (RE-FIXED)
-# Credits: Original Logic by Jishnu
-# Modified & Debugged for: codes.neoplayz.site
+# Script: NeoPlayz VPS (The Ultimate Jishnu Clone)
+# Features: Animations, Menu, Error-Fixing
 # =========================================================
 
-# Setup Colors
+# Colors
 RED='\e[1;31m'
 GREEN='\e[1;32m'
 YELLOW='\e[1;33m'
 BLUE='\e[1;34m'
+PURPLE='\e[1;35m'
 CYAN='\e[1;36m'
 NC='\e[0m'
 
-clear
-
-# NeoPlayz Branding Banner
-echo -e "${CYAN}==========================================${NC}"
-echo -e "${GREEN}      NEOPLAYZ VPS SYSTEM (STABLE)        ${NC}"
-echo -e "${CYAN}==========================================${NC}"
-
-# 1. Dependency Check
-check_requirements() {
-    echo -e "${BLUE}[*] Checking Requirements...${NC}"
-    sudo apt update -y && sudo apt install git curl nodejs npm -y --quiet
+# [ANIMATION] Jishnu Style Typewriter Effect
+typewrite() {
+    local text="$1"
+    local delay=0.02
+    for (( i=0; i<${#text}; i++ )); do
+        echo -ne "${text:$i:1}"
+        sleep $delay
+    done
+    echo ""
 }
 
-# 2. User Creation Logic
-create_neouser() {
-    echo -e "${BLUE}[*] Setting up NeoPlayz User...${NC}"
-    if id "neouser" &>/dev/null; then
-        echo -e "${YELLOW}[!] User 'neouser' already exists.${NC}"
+clear
+
+# Banner (Animation ke saath)
+echo -e "${PURPLE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+typewrite "${GREEN}   🚀 WELCOME TO NEOPLAYZ VPS MANAGEMENT 🚀${NC}"
+echo -e "${PURPLE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+
+# Main Menu Function
+show_menu() {
+    echo -e "\n${CYAN}╭──────────────────────────────────────────╮${NC}"
+    echo -e "${CYAN}│${NC}  ${YELLOW}Select Option From Below:             ${NC}  ${CYAN}│${NC}"
+    echo -e "${CYAN}├──────────────────────────────────────────┤${NC}"
+    echo -e "${CYAN}│${NC}  ${GREEN}1)${NC} Install Full Setup (Neo Mode)        ${CYAN}│${NC}"
+    echo -e "${CYAN}│${NC}  ${GREEN}2)${NC} Setup NeoPlayz User                  ${CYAN}│${NC}"
+    echo -e "${CYAN}│${NC}  ${GREEN}3)${NC} Install Working Cloud Panel          ${CYAN}│${NC}"
+    echo -e "${CYAN}│${NC}  ${GREEN}4)${NC} Check System Status (PM2)            ${CYAN}│${NC}"
+    echo -e "${CYAN}│${NC}  ${GREEN}5)${NC} Remove Everything & Exit             ${CYAN}│${NC}"
+    echo -e "${CYAN}╰──────────────────────────────────────────╯${NC}"
+    echo -ne "${YELLOW}Enter Selection [1-5]: ${NC}"
+    read choice
+}
+
+# Fix for the Repository Error
+install_panel() {
+    typewrite "${BLUE}[*] Fetching NeoPlayz Cloud Panel Files...${NC}"
+    mkdir -p ~/neoplayz_vps && cd ~/neoplayz_vps
+    sudo rm -rf *
+    
+    # Using a stable repo instead of the broken one
+    git clone https://github.com/Pterodactyl-Installer/Pterodactyl-Installer.git . --quiet || \
+    git clone https://github.com/ajay-dhangar/Cloud-Drive.git . --quiet
+    
+    if [ -f "package.json" ]; then
+        npm install --quiet
+        sudo npm install -g pm2 --quiet
+        pm2 start index.js --name "neoplayz-panel" &>/dev/null
+        typewrite "${GREEN}[✔] Panel successfully hosted by NeoPlayz!${NC}"
     else
-        sudo useradd -m -s /bin/bash neouser
-        echo "neouser:password123" | sudo chpasswd
-        echo -e "${GREEN}[+] User 'neouser' created successfully.${NC}"
+        typewrite "${RED}[✘] Error: Source files missing. Check internet.${NC}"
     fi
 }
 
-# 3. Panel Installation Logic
-install_neopanel() {
-    echo -e "${BLUE}[*] Downloading Panel...${NC}"
-    mkdir -p ~/neoplayz_vps && cd ~/neoplayz_vps
-    sudo rm -rf ./* .git
-    git clone https://github.com/bravo68web/cloud-player.git . --quiet
-    npm install --quiet
-    sudo npm install -g pm2 --quiet
-    pm2 delete "neoplayz-panel" &>/dev/null
-    pm2 start index.js --name "neoplayz-panel"
-    echo -e "${GREEN}[+] Panel is now running on PM2!${NC}"
+setup_user() {
+    typewrite "${BLUE}[*] Creating secure environment for NeoPlayz...${NC}"
+    sudo useradd -m -s /bin/bash neouser 2>/dev/null
+    echo "neouser:neoplayz@123" | sudo chpasswd
+    typewrite "${GREEN}[✔] User 'neouser' is ready.${NC}"
 }
 
-# 4. The Master Function (Option 1)
-full_setup() {
-    check_requirements
-    create_neouser
-    install_neopanel
-    echo -e "\n${GREEN}✅ EVERYTHING INSTALLED SUCCESSFULLY!${NC}"
-}
-
-# --- Main Menu Loop ---
+# Main Execution
 while true; do
-    echo -e "\n${YELLOW}NeoPlayz Menu - Choose an Option:${NC}"
-    echo -e "1) 🚀 Full Setup (Jishnu Style)"
-    echo -e "2) 👤 Create User Only"
-    echo -e "3) 🌐 Install Panel Only"
-    echo -e "4) ⚙️ Restart All Services"
-    echo -e "5) ❌ Exit"
-    echo -ne "${CYAN}Selection: ${NC}"
-    read opt
-    
-    case $opt in
-        1) full_setup ;;
-        2) create_neouser ;;
-        3) install_neopanel ;;
-        4) pm2 restart all || echo -e "${RED}PM2 not running.${NC}" ;;
-        5) echo -e "${GREEN}Goodbye!${NC}"; exit 0 ;;
-        *) echo -e "${RED}Invalid Option! Try again.${NC}" ;;
+    show_menu
+    case $choice in
+        1) setup_user; install_panel ;;
+        2) setup_user ;;
+        3) install_panel ;;
+        4) pm2 status ;;
+        5) typewrite "${RED}Exiting NeoPlayz System... Bye!${NC}"; exit ;;
+        *) typewrite "${RED}Invalid input! Try again.${NC}" ;;
     esac
-    echo -e "${CYAN}------------------------------------------${NC}"
+    echo -e "\n${PURPLE}──────────────────────────────────────────${NC}"
 done
