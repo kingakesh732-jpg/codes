@@ -1,0 +1,37 @@
+#!/bin/bash
+
+# NeoPlayz Script - Based on Jishnu's Code Logic
+clear
+echo -e "\e[1;32m   _  __________  ____  _      ______  ______ \e[0m"
+echo -e "\e[1;32m  / |/ / __/ __ \/ __ \/ |    / /_  / /_  __/ \e[0m"
+echo -e "\e[1;32m /    / _// /_/ / /_/ /| | /| / / / /_  / /    \e[0m"
+echo -e "\e[1;32m/_/|_/___/\____/\____/ |__/|__/ /___/ /_/     \e[0m"
+echo -e "\e[1;36m--------------------------------------------\e[0m"
+echo -e "\e[1;33m      NEOPLAYZ ALL-IN-ONE SETUP WORKING     \e[0m"
+echo -e "\e[1;36m--------------------------------------------\e[0m"
+
+setup_vps() {
+    echo -e "\n\e[1;34m[*] System Update & Dependencies...\e[0m"
+    sudo apt update -y && sudo apt install git curl nodejs npm -y --quiet
+
+    echo -e "\e[1;34m[*] Creating User: neouser...\e[0m"
+    if ! id "neouser" &>/dev/null; then
+        sudo useradd -m -s /bin/bash neouser
+        echo "neouser:password123" | sudo chpasswd
+    fi
+
+    echo -e "\e[1;34m[*] Installing CloudPlayer Panel...\e[0m"
+    mkdir -p ~/neoplayz_vps && cd ~/neoplayz_vps
+    rm -rf *
+    git clone https://github.com/bravo68web/cloud-player.git . --quiet
+    npm install --quiet
+
+    echo -e "\e[1;34m[*] Starting Panel with PM2...\e[0m"
+    sudo npm install -g pm2 --quiet
+    pm2 delete "neoplayz-panel" &>/dev/null
+    pm2 start index.js --name "neoplayz-panel"
+
+    echo -e "\n\e[1;32m[SUCCESS] Aapka NeoPlayz Code Work Kar Raha Hai!\e[0m"
+}
+
+setup_vps
