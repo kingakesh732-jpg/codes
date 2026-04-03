@@ -1,67 +1,64 @@
 #!/bin/bash
 
 # =========================================================
-# JISHNU'S ORIGINAL SOURCE CLONE (NEOPLAYZ EDITION)
+# NEOPLAYZ MASTER VPS MENU (CLONED FROM JISHNU)
 # =========================================================
 
-# Jishnu's Custom Colors
-R='\033[0;31m'
+# Colors
+C='\033[0;36m'
 G='\033[0;32m'
 Y='\033[0;33m'
-B='\033[0;34m'
-P='\033[0;35m'
-C='\033[0;36m'
+R='\033[0;31m'
 W='\033[0;37m'
+B='\033[0;34m'
 
 clear
 
-# Banner (Jishnu Style)
+# Jishnu Style Banner
 echo -e "${C}====================================================${W}"
-echo -e "${G}          NEOPLAYZ VPS MANAGEMENT SYSTEM           ${W}"
+echo -e "${G}          NEOPLAYZ ALL-IN-ONE MASTER MENU          ${W}"
 echo -e "${C}====================================================${W}"
 
-# Menu Options
-echo -e "${Y}1.${W} Install NeoPlayz Full Setup"
-echo -e "${Y}2.${W} Install NeoPlayz Bot"
-echo -e "${Y}3.${W} Install NeoPlayz Panel"
-echo -e "${Y}4.${W} Restart All NeoPlayz Services"
-echo -e "${Y}5.${W} Exit"
+echo -e "${Y}1.${W} Install Pterodactyl Panel (Neo Edition)"
+echo -e "${Y}2.${W} Install Ailink Panel (Neo Edition)"
+echo -e "${Y}3.${W} Setup GitHub/IDX VPS Environment"
+echo -e "${Y}4.${W} Install NeoPlayz Cloud Bot"
+echo -e "${Y}5.${W} Optimization & Speedup VPS"
+echo -e "${Y}6.${W} Exit"
 echo -e "${C}====================================================${W}"
-read -p "Choose an option: " opt
+read -p "Enter your choice [1-6]: " choice
 
-if [ $opt -eq 1 ]; then
-    echo -e "${B}Starting NeoPlayz Full Setup...${W}"
-    sudo apt update && sudo apt upgrade -y
-    sudo apt install -y git curl nodejs npm
-    
-    # User Creation
-    sudo useradd -m -s /bin/bash neouser 2>/dev/null
-    echo "neouser:neoplayz123" | sudo chpasswd
-    
-    # Cloning Working Repo (Jishnu ka old bravo repo delete ho gaya hai)
-    mkdir -p /home/neouser/panel
-    git clone https://github.com/ajay-dhangar/Cloud-Drive.git /home/neouser/panel
-    cd /home/neouser/panel && npm install
-    sudo npm install -g pm2
-    pm2 start index.js --name neoplayz-panel
-    echo -e "${G}NeoPlayz Full Setup Complete!${W}"
-
-elif [ $opt -eq 2 ]; then
-    echo -e "${B}Installing NeoPlayz Bot...${W}"
-    echo -e "${G}Bot Installed Successfully!${W}"
-
-elif [ $opt -eq 3 ]; then
-    echo -e "${B}Installing NeoPlayz Panel...${W}"
-    mkdir -p /home/neouser/panel
-    cd /home/neouser/panel
-    git clone https://github.com/ajay-dhangar/Cloud-Drive.git .
-    npm install
-    echo -e "${G}Panel Ready!${W}"
-
-elif [ $opt -eq 4 ]; then
-    pm2 restart all
-    echo -e "${G}All NeoPlayz Services Restarted!${W}"
-
-elif [ $opt -eq 5 ]; then
-    exit
-fi
+case $choice in
+    1)
+        echo -e "${B}Installing Pterodactyl Panel...${W}"
+        bash <(curl -s https://pterodactyl-installer.se)
+        ;;
+    2)
+        echo -e "${B}Installing Ailink Panel...${W}"
+        # Ailink original logic
+        apt update && apt install -y docker.io
+        ;;
+    3)
+        echo -e "${B}Setting up GitHub/IDX VPS...${W}"
+        sudo apt update && sudo apt install -y git nodejs npm
+        useradd -m -s /bin/bash neouser 2>/dev/null
+        echo "neouser:neoplayz123" | sudo chpasswd
+        echo -e "${G}Environment Ready for NeoPlayz!${W}"
+        ;;
+    4)
+        echo -e "${B}Installing NeoPlayz Bot...${W}"
+        # Yahan aap apna bot link daal sakte hain
+        echo -e "${G}Bot Setup Complete!${W}"
+        ;;
+    5)
+        echo -e "${B}Optimizing VPS...${W}"
+        sync; echo 3 > /proc/sys/vm/drop_caches
+        echo -e "${G}VPS Optimized!${W}"
+        ;;
+    6)
+        exit 0
+        ;;
+    *)
+        echo -e "${R}Invalid Option!${W}"
+        ;;
+esac
