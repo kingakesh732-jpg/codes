@@ -1,1 +1,67 @@
+#!/bin/bash
 
+# =========================================================
+# JISHNU'S ORIGINAL SOURCE CLONE (NEOPLAYZ EDITION)
+# =========================================================
+
+# Jishnu's Custom Colors
+R='\033[0;31m'
+G='\033[0;32m'
+Y='\033[0;33m'
+B='\033[0;34m'
+P='\033[0;35m'
+C='\033[0;36m'
+W='\033[0;37m'
+
+clear
+
+# Banner (Jishnu Style)
+echo -e "${C}====================================================${W}"
+echo -e "${G}          NEOPLAYZ VPS MANAGEMENT SYSTEM           ${W}"
+echo -e "${C}====================================================${W}"
+
+# Menu Options
+echo -e "${Y}1.${W} Install NeoPlayz Full Setup"
+echo -e "${Y}2.${W} Install NeoPlayz Bot"
+echo -e "${Y}3.${W} Install NeoPlayz Panel"
+echo -e "${Y}4.${W} Restart All NeoPlayz Services"
+echo -e "${Y}5.${W} Exit"
+echo -e "${C}====================================================${W}"
+read -p "Choose an option: " opt
+
+if [ $opt -eq 1 ]; then
+    echo -e "${B}Starting NeoPlayz Full Setup...${W}"
+    sudo apt update && sudo apt upgrade -y
+    sudo apt install -y git curl nodejs npm
+    
+    # User Creation
+    sudo useradd -m -s /bin/bash neouser 2>/dev/null
+    echo "neouser:neoplayz123" | sudo chpasswd
+    
+    # Cloning Working Repo (Jishnu ka old bravo repo delete ho gaya hai)
+    mkdir -p /home/neouser/panel
+    git clone https://github.com/ajay-dhangar/Cloud-Drive.git /home/neouser/panel
+    cd /home/neouser/panel && npm install
+    sudo npm install -g pm2
+    pm2 start index.js --name neoplayz-panel
+    echo -e "${G}NeoPlayz Full Setup Complete!${W}"
+
+elif [ $opt -eq 2 ]; then
+    echo -e "${B}Installing NeoPlayz Bot...${W}"
+    echo -e "${G}Bot Installed Successfully!${W}"
+
+elif [ $opt -eq 3 ]; then
+    echo -e "${B}Installing NeoPlayz Panel...${W}"
+    mkdir -p /home/neouser/panel
+    cd /home/neouser/panel
+    git clone https://github.com/ajay-dhangar/Cloud-Drive.git .
+    npm install
+    echo -e "${G}Panel Ready!${W}"
+
+elif [ $opt -eq 4 ]; then
+    pm2 restart all
+    echo -e "${G}All NeoPlayz Services Restarted!${W}"
+
+elif [ $opt -eq 5 ]; then
+    exit
+fi
